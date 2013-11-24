@@ -1,0 +1,100 @@
+#!/bin/bash
+#
+# Benannt nach der Göttin der Reinheit sendet es eine E-Mail an alle
+# konfigurierten Empfänger und erinnert sie, mit welcher häuslichen Pflicht sie
+# dran sind.
+
+RCFILE="$HOME/.aglaiarc"
+STATUSFILE="$HOME/.aglaiastatus"
+
+# Schreibt aktuellen Zeitstempel und alle Argumente nach STDERR
+err() {
+  echo "[$(date +'%FT%T%z')] $@" >&2
+}
+
+# Liest aus $RCFILE die Empfänger und die Aufgaben aus
+read_config() {
+  if [[ -w "$RCFILE" ]]; then
+    source "$RCFILE"
+  else
+    err "Keine Konfigurationsdatei gefunden."
+    exit 1
+  fi
+
+  if [[ ! "$RECP" ]]; then
+    err "Konnte $RCFILE lesen, aber es wurden keine Empänger gesetzt."
+    exit 1
+  fi
+  if [[ ! "$TASK" ]]; then
+    err "Konnte $RCFILE lesen, aber es wurden keine Aufgaben gesetzt."
+    exit 1
+  fi
+}
+
+# Belegt $STATUS mit dem aktuellen Status (wer womit dran ist)
+read_status() {
+  if [[ -r "$STATUSFILE" ]]; then
+    STATUS=$(<$STATUSFILE)
+  else
+    err "Keine Statusdatei gefunden."
+    exit 1
+  fi
+
+  # $STATUS muss eine Zahl zwischen 0 und Aufgabenzahl sein
+  if [[ ! ($STATUS -ge 0 && $STATUS -lt ${#TASK[*]}) ]]; then
+    err "Konnte '$STATUS' lesen, aber der Wert war ungültig."
+    exit 1
+  fi
+}
+
+# Liefert aus "Name <mail@adres.se>" den Namen heraus
+vorname_aus_email() {
+  echo $1 | cut -d ' ' -f 1
+}
+
+# Liefert aus "Name <mail@adres.se>" die mail@adres.se heraus
+emailadresse_aus_email() {
+  email=$(echo $1 | cut -d ' ' -f 2)
+  echo ${email:1:-1}
+}
+
+# Erzeugt den E-Mail-Text mit Adressaten $1 und Aufgabe $2
+mail_text() {
+  echo -e "Hallo ${1},\n
+du bist die nächsten 2 Wochen dran mit ${2}.\n
+Vielen Dank für deine Mühe unsere WG sauber zu halten!"
+}
+
+# Sendet E-Mail an $1 mit Betreff $2 und Text $3
+send_mail() {
+  echo -e "Content-Type: text/plain; charset=utf-8
+Subject: ${2}\n
+${3}" | msmtp "$1"
+}
+
+main() {
+  read_config
+  read_status
+  # Anzahl aller Tasks
+  N=${#TASK[*]}
+
+  for (( i = 0; i < $N; i++ )); do
+    # aktueller Status (wenn $i = 0, dann gilt $i = $j)
+    j=$((${STATUS} + $i % $N))
+
+    recp=${RECP[$i]}
+    addr=$(emailadresse_aus_email "$recp")
+    task=${TASK[$j]}
+    vorname=$(vorname_aus_email "$recp")
+    text=$(mail_text "$vorname" "$task")
+    subj="[AGLAIA] $task"
+
+    send_mail "$addr" "$subj" "$text"
+  done
+
+  # erhöhe STATUS um 1 und speichere es
+  I=$((${STATUS} + 1 % $N))
+  echo $I > $STATUSFILE
+}
+
+main "$@"
