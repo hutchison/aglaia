@@ -41,11 +41,11 @@ read_config() {
   fi
 
   if [[ ! "$RECP" ]]; then
-    err "Konnte $RCFILE lesen, aber es wurden keine Empänger gesetzt."
+    err "Konnte \$RCFILE ('$RCFILE') lesen, aber es wurden keine Empänger gesetzt."
     exit 1
   fi
   if [[ ! "$TASK" ]]; then
-    err "Konnte $RCFILE lesen, aber es wurden keine Aufgaben gesetzt."
+    err "Konnte \$RCFILE ('$RCFILE') lesen, aber es wurden keine Aufgaben gesetzt."
     exit 1
   fi
 }
@@ -61,7 +61,7 @@ read_status() {
 
   # $STATUS muss eine Zahl zwischen 0 und Aufgabenzahl sein
   if [[ ! ($STATUS -ge 0 && $STATUS -lt ${#TASK[*]}) ]]; then
-    err "Konnte '$STATUS' lesen, aber der Wert war ungültig."
+    err "Konnte \$STATUS ($STATUS) lesen, aber der Wert war ungültig."
     exit 1
   fi
 }
