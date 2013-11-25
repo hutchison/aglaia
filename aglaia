@@ -80,7 +80,7 @@ main() {
 
   for (( i = 0; i < $N; i++ )); do
     # aktueller Status (wenn $i = 0, dann gilt $i = $j)
-    j=$((${STATUS} + $i % $N))
+    j=$(( (${STATUS} + $i) % $N))
 
     recp=${RECP[$i]}
     addr=$(emailadresse_aus_email "$recp")
@@ -93,7 +93,7 @@ main() {
   done
 
   # erhöhe STATUS um 1 und speichere es
-  I=$((${STATUS} + 1 % $N))
+  I=$(( (${STATUS} + 1) % $N))
   echo $I > $STATUSFILE
 }
 
