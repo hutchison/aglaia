@@ -98,12 +98,12 @@ main() {
   N=${#TASK[*]}
 
   for (( i = 0; i < $N; i++ )); do
-    # aktueller Status (wenn $i = 0, dann gilt $i = $j)
-    j=$(( (${STATUS} + $i) % $N))
+    # aktueller Status (wenn $i = 0, dann gilt $i = $s)
+    s=$(( (${STATUS} + $i) % $N))
 
     recp=${RECP[$i]}
     addr=$(emailadresse_aus_email "$recp")
-    task=${TASK[$j]}
+    task=${TASK[$s]}
     vorname=$(vorname_aus_email "$recp")
     text=$(mail_text "$vorname" "$task")
     subj="[AGLAIA] $task"
