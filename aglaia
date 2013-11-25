@@ -33,7 +33,7 @@ err() {
 
 # Liest aus $RCFILE die Empfänger und die Aufgaben aus
 read_config() {
-  if [[ -w "$RCFILE" ]]; then
+  if [[ -r "$RCFILE" ]]; then
     source "$RCFILE"
   else
     err "Keine Konfigurationsdatei gefunden."
@@ -52,7 +52,7 @@ read_config() {
 
 # Belegt $STATUS mit dem aktuellen Status (wer womit dran ist)
 read_status() {
-  if [[ -r "$STATUSFILE" ]]; then
+  if [[ -w "$STATUSFILE" ]]; then
     STATUS=$(<$STATUSFILE)
   else
     err "Keine Statusdatei gefunden."
