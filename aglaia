@@ -4,7 +4,26 @@
 # konfigurierten Empfänger und erinnert sie, mit welcher häuslichen Pflicht sie
 # dran sind.
 
+# Im RCFILE müssen einerseits ein Array von Empfängern
+#
+# RECP=(
+#  "Alice <alice@example.com>"
+#  "Bob <bob@example.com>"
+#  "Charles <charles@example.com>"
+# )
+#
+# und andererseits die Aufgaben
+#
+# TASK=(
+#   "Bad putzen"
+#   "Flur saugen"
+#   "Küche säubern"
+# )
+#
+# stehen.
 RCFILE="$HOME/.aglaiarc"
+
+# Im STATUSFILE darf nur eine Zahl zwischen 0 und Anzahl(TASK) stehen
 STATUSFILE="$HOME/.aglaiastatus"
 
 # Schreibt aktuellen Zeitstempel und alle Argumente nach STDERR
